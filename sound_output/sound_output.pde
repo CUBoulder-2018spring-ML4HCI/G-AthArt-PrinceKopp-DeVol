@@ -49,7 +49,7 @@ void setup() {
      textHues[i] = (int)generateColor(i+1);
   }
   file = new SoundFile(this, "20 Minute Backing Track - Hard Rock Drum Beat 90 BPM.mp3");
-  file2 = new SoundFile(this, "clickTrack.mp3");
+  file2 = new SoundFile(this, "cowbell.wav");
   file.play();
   
   now = millis();
@@ -77,14 +77,21 @@ void draw() {
   drawText();
   
   if(millis() - now > delay){
-    if (delayCounter > 9){ 
+    if (delayCounter > 49){ 
+      if (misses>4) {
+ 
       file2.play();
+      }
+      
       misses = 0;
+      delayCounter = 0;
+    
     }
-    if (lastMessage > 2 && !grabbedMessage){
+    if (lastMessage > 1 && !grabbedMessage){
       misses++;
     }
     grabbedMessage = false;
+    delayCounter++;
   }
 
 }
