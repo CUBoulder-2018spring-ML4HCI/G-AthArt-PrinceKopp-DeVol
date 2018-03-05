@@ -13,8 +13,8 @@ SoundFile file2;
 OscP5 oscP5;
 NetAddress dest;
 
-String[] messageNames = {"/on_left", "/on_right", "/missed_left", "/missed_right" }; //message names for each DTW gesture type
-
+String[] inputNames = {"/on_left", "/on_right", "/missed_left", "/missed_right" }; //message names for each DTW gesture type
+String[] messageNames = {"/outputs_1", "/outputs_2", "/outputs_3", "/outputs_4" }; //message names for each DTW gesture type
 
 //No need to edit:
 PFont myFont, myBigFont;
@@ -60,7 +60,7 @@ void setup() {
   //wave.patch( out );
   
   //Initialize OSC communication
-  oscP5 = new OscP5(this,12000); //listen for OSC messages on port 12000 (Wekinator default)
+  oscP5 = new OscP5(this,6449); //listen for OSC messages on port 12000 (Wekinator default)
   dest = new NetAddress("127.0.0.1",6448); //send messages back to Wekinator on port 6448, localhost (this machine) (default)
   
   
@@ -95,7 +95,6 @@ void draw() {
 
 //This is called automatically when OSC message is received
 void oscEvent(OscMessage theOscMessage) {
- //println("received message");
  for (int i = 0; i < numClasses; i++) {
     if (theOscMessage.checkAddrPattern(messageNames[i]) == true) {
      // println("received1");
@@ -111,7 +110,7 @@ void oscEvent(OscMessage theOscMessage) {
 void showMessage(int i) {
     currentHue = hues[i];
     currentTextHue = textHues[i];
-    currentMessage = messageNames[i];
+    currentMessage = inputNames[i];
     
    
     //wave.setFrequency((float)(261 * Math.pow(1.059, i*2)));
