@@ -24,4 +24,4 @@ Derek and Eli's DTW Project
 
 
 ### Demo Video
-* [Video]()
+* [Video](https://www.youtube.com/watch?v=tAD6arDl2us)
