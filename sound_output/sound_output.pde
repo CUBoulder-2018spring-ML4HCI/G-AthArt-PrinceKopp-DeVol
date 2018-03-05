@@ -13,8 +13,8 @@ SoundFile file2;
 OscP5 oscP5;
 NetAddress dest;
 
-String[] inputNames = {"/on_left", "/on_right", "/missed_left", "/missed_right" }; //message names for each DTW gesture type
-String[] messageNames = {"/outputs_1", "/outputs_2", "/outputs_3", "/outputs_4" }; //message names for each DTW gesture type
+String[] messageNames = {"/on_left", "/on_right", "/missed_left", "/missed_right" }; //message names for each DTW gesture type
+//String[] messageNames = {"/outputs_1", "/outputs_2", "/outputs_3", "/outputs_4" }; //message names for each DTW gesture type
 
 //No need to edit:
 PFont myFont, myBigFont;
@@ -29,7 +29,9 @@ int currentTextHue = 255;
 String currentMessage = "Waiting...";
 float amp = 0.0;
 int misses;
-int now, delay;
+int now, delay, delayCounter;
+int lastMessage;
+boolean grabbedMessage;
 
 Minim       minim;
 AudioOutput out;
@@ -51,16 +53,12 @@ void setup() {
   file.play();
   
   now = millis();
-  delay = 1000;
-  //minim = new Minim(this);
-  //out = minim.getLineOut();
-  //wave = new Oscil( 440, 0.5f, Waves.SQUARE );
-  //wave.setAmplitude(0);
-  //// patch the Oscil to the output
-  //wave.patch( out );
+  delay = 100;
+  lastMessage = -1;
+  grabbedMessage = false;
   
   //Initialize OSC communication
-  oscP5 = new OscP5(this,6449); //listen for OSC messages on port 12000 (Wekinator default)
+  oscP5 = new OscP5(this,12000); //listen for OSC messages on port 12000 (Wekinator default)
   dest = new NetAddress("127.0.0.1",6448); //send messages back to Wekinator on port 6448, localhost (this machine) (default)
   
   
@@ -79,18 +77,16 @@ void draw() {
   drawText();
   
   if(millis() - now > delay){
-    if (misses > 5) {
+    if (delayCounter > 9){ 
       file2.play();
+      misses = 0;
     }
-    misses = 0;
+    if (lastMessage > 2 && !grabbedMessage){
+      misses++;
+    }
+    grabbedMessage = false;
   }
-  
-  //if (amp > 0.001) {
-  //  amp = .5 * amp;
-  //} else {
-  //  amp = 0;
-  //}
-  //wave.setAmplitude( amp );
+
 }
 
 //This is called automatically when OSC message is received
@@ -99,6 +95,8 @@ void oscEvent(OscMessage theOscMessage) {
     if (theOscMessage.checkAddrPattern(messageNames[i]) == true) {
      // println("received1");
        showMessage(i);
+       grabbedMessage = true;
+       lastMessage = i;
        if (i > 1) {
          println(i);
          misses++;
@@ -110,11 +108,8 @@ void oscEvent(OscMessage theOscMessage) {
 void showMessage(int i) {
     currentHue = hues[i];
     currentTextHue = textHues[i];
-    currentMessage = inputNames[i];
+    currentMessage = messageNames[i];
     
-   
-    //wave.setFrequency((float)(261 * Math.pow(1.059, i*2)));
-    // amp = 1;
 }
 
 //Write instructions to screen.
@@ -135,7 +130,6 @@ void drawText() {
 
 
 float generateColor(int which) {
-  float f = 100; 
   int i = which;
   if (i <= 0) {
      return 100;
